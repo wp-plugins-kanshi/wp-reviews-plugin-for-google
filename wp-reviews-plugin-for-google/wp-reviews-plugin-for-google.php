@@ -9,7 +9,7 @@ Author: Trustindex.io <support@trustindex.io>
 Author URI: https://www.trustindex.io/
 Contributors: trustindex
 License: GPLv2 or later
-Version: 13.2.2
+Version: 13.2.3
 Requires at least: 6.2
 Requires PHP: 7.0
 Text Domain: wp-reviews-plugin-for-google
@@ -22,7 +22,7 @@ Copyright 2019 Trustindex Kft (email: support@trustindex.io)
 defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 require_once plugin_dir_path(__FILE__) . 'include' . DIRECTORY_SEPARATOR . 'cache-plugin-filters.php';
 require_once plugin_dir_path(__FILE__) . 'trustindex-plugin.class.php';
-$trustindex_pm_google = new TrustindexPlugin_google("google", __FILE__, "13.2.2", "Widgets for Google Reviews", "Google");
+$trustindex_pm_google = new TrustindexPlugin_google("google", __FILE__, "13.2.3", "Widgets for Google Reviews", "Google");
 $pluginManager = 'TrustindexPlugin_google';
 $pluginManagerInstance = $trustindex_pm_google;
 add_action('admin_init', function() { ob_start(); });
@@ -138,7 +138,7 @@ foreach ($pluginManagerInstance->getNotificationOptions() as $type => $options) 
 if (!$pluginManagerInstance->isNotificationActive($type)) {
 continue;
 }
-echo '<div class="notice notice-'. esc_attr($options['type']) .' '. ($options['is-closeable'] ? 'is-dismissible' : '') .' trustindex-notification-row '. esc_attr($options['extra-class']).'" data-close-url="'. esc_url(admin_url('admin.php?page='. $pluginManagerInstance->get_plugin_slug() .'/settings.php&notification='. $type .'&action=close')) .'">';
+echo '<div class="notice notice-'. esc_attr($options['type']) .' '. ($options['is-closeable'] ? 'is-dismissible' : '') .' trustindex-notification-row '. esc_attr($options['extra-class']).'" data-close-url="'. esc_url(wp_nonce_url(admin_url('admin.php?page='. $pluginManagerInstance->get_plugin_slug() .'/settings.php&notification='. $type .'&action=close'), 'ti-notification')) .'">';
 if ($type === 'rate-us') {
 echo '<div class="trustindex-star-row">&starf;&starf;&starf;&starf;&starf;</div>';
 }

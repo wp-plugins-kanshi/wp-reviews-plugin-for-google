@@ -6,6 +6,7 @@ $wpdb->hide_errors();
 $notCreatedTables = [];
 $mysqlError = "";
 if (is_multisite()) {
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 $sites = $wpdb->get_results('SELECT blog_id AS id FROM `'.$wpdb->blogs.'` ORDER BY blog_id', ARRAY_A);
 } else {
 $sites = [['id' => -1]];

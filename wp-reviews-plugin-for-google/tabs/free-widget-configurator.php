@@ -123,6 +123,7 @@ trustindex_plugin_disconnect_page();
 }
 if ($ti_command === 'save-page') {
 check_admin_referer('ti-save-page');
+// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 $pageDetails = isset($_POST['page_details']) ? json_decode(wp_unslash($_POST['page_details']), true) : null;
 $reviewDownload = isset($_POST['review_download']) ? sanitize_text_field(wp_unslash($_POST['review_download'])) : 0;
 if ($pageDetails['name']) {
@@ -171,6 +172,7 @@ delete_option($pluginManagerInstance->get_option_name('review-download-is-connec
 if (is_array($reviews)) {
 foreach ($reviews as $row) {
 $date = isset($row['created_at']) ? $row['created_at'] : (isset($row['date']) ? $row['date'] : '');
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 $wpdb->insert($tableName, [
 'user' => $row['reviewer']['name'],
 'user_photo' => $row['reviewer']['avatar_url'],
@@ -205,11 +207,13 @@ exit;
 else if ($ti_command === 'save-style') {
 check_admin_referer('ti-save-style');
 $styleId = isset($_REQUEST['style_id']) ? (int)$_REQUEST['style_id'] : 4;
+if (14 !== $styleId) {
 update_option($pluginManagerInstance->get_option_name('style-id'), $styleId, false);
 delete_option($pluginManagerInstance->get_option_name('review-content'));
 trustindex_plugin_change_step(3);
 if (in_array($pluginManager::$widget_templates['templates'][$styleId]['type'], ['floating', 'fomo'])) {
 $pluginManagerInstance->noreg_save_css();
+}
 }
 if (isset($_GET['style_id'])) {
 header('Location: admin.php?page='.esc_attr($_page).'&tab=free-widget-configurator');
@@ -256,7 +260,7 @@ exit;
 else if ($ti_command === 'save-nameformat') {
 check_admin_referer('ti-save-nameformat');
 $value = isset($_POST['nameformat']) ? sanitize_text_field(wp_unslash($_POST['nameformat'])) : '';
-update_option($pluginManagerInstance->get_option_name('nameformat'), $nameformat, false);
+update_option($pluginManagerInstance->get_option_name('nameformat'), $value, false);
 exit;
 }
 else if ($ti_command === 'save-top-rated-type') {
@@ -680,7 +684,7 @@ if (!isset($template['is-active']) || $template['is-active']):
 <div class="ti-box-header ti-box-header-normal">
 <?php echo esc_html(__('Layout', 'wp-reviews-plugin-for-google')); ?>:
 <strong><?php echo esc_html($template['name']); ?></strong>
-<?php if ($template['is-popular']): ?>
+<?php if ($template['is-popular'] || 14 === $id): ?>
 <span class="ti-badge ti-most-popular-badge ti-tooltip">
 <?php echo esc_html(__('Most popular', 'wp-reviews-plugin-for-google')); ?> <span class="dashicons dashicons-info-outline"></span>
 <span class="ti-tooltip-message"><?php echo
@@ -689,7 +693,11 @@ esc_html(__('This widget layout helps build trust and effectively increases sale
 ?></span>
 </span>
 <?php endif; ?>
-<?php if ((!$template['is-top-rated-badge'] || $isTopRatedBadgeValid) && !$fomoWidgetInvalid): ?>
+<?php if (14 === $id) :?>
+<a href="#" class="ti-btn ti-btn-sm ti-pull-right" style="pointer-events: none;background: grey">
+<?php echo esc_html(__('Paid package feature', 'wp-reviews-plugin-for-google')); ?>
+</a>
+<?php elseif ((!$template['is-top-rated-badge'] || $isTopRatedBadgeValid) && !$fomoWidgetInvalid): ?>
 <a href="<?php echo esc_url(wp_nonce_url('?page='. esc_attr($_page) .'&tab=free-widget-configurator&command=save-style&style_id='. esc_attr(urlencode($id)), 'ti-save-style')); ?>" class="ti-btn ti-btn-sm ti-btn-loading-on-click ti-pull-right"><?php echo esc_html(__('Select', 'wp-reviews-plugin-for-google')); ?></a>
 <div class="clear"></div>
 <?php endif; ?>
