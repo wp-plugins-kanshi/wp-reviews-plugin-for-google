@@ -9,7 +9,7 @@ Author: Trustindex.io <support@trustindex.io>
 Author URI: https://www.trustindex.io/
 Contributors: trustindex
 License: GPLv2 or later
-Version: 13.2.3
+Version: 13.2.5
 Requires at least: 6.2
 Requires PHP: 7.0
 Text Domain: wp-reviews-plugin-for-google
@@ -22,7 +22,7 @@ Copyright 2019 Trustindex Kft (email: support@trustindex.io)
 defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 require_once plugin_dir_path(__FILE__) . 'include' . DIRECTORY_SEPARATOR . 'cache-plugin-filters.php';
 require_once plugin_dir_path(__FILE__) . 'trustindex-plugin.class.php';
-$trustindex_pm_google = new TrustindexPlugin_google("google", __FILE__, "13.2.3", "Widgets for Google Reviews", "Google");
+$trustindex_pm_google = new TrustindexPlugin_google("google", __FILE__, "13.2.5", "Widgets for Google Reviews", "Google");
 $pluginManager = 'TrustindexPlugin_google';
 $pluginManagerInstance = $trustindex_pm_google;
 add_action('admin_init', function() { ob_start(); });
@@ -88,9 +88,17 @@ add_action('elementor/controls/controls_registered', function($controlsManager) 
 require_once(__DIR__ . '/include/elementor-widgets.php');
 $controlsManager->register_control('choose', new \Elementor\Control_Choose2());
 });
-add_action('elementor/widgets/widgets_registered', function ($widgetsManager) use ($pluginManagerInstance) {
+add_action('elementor/widgets/register', function ($widgetsManager) use ($pluginManagerInstance) {
+if (method_exists($widgetsManager, 'register')) {
 require_once(__DIR__ . '/include/elementor-widgets.php');
 $widgetsManager->register(new \Elementor\TrustrindexElementorWidget_Google([], [$pluginManagerInstance]));
+}
+});
+add_action('elementor/widgets/widgets_registered', function ($widgetsManager) use ($pluginManagerInstance) {
+if (method_exists($widgetsManager, 'register_widget_type')) {
+require_once(__DIR__ . '/include/elementor-widgets.php');
+$widgetsManager->register_widget_type(new \Elementor\TrustrindexElementorWidget_Google([], [$pluginManagerInstance]));
+}
 });
 add_action('init', [ $pluginManagerInstance, 'register_tinymce_features' ]);
 add_action('wp_ajax_list_trustindex_widgets', [ $pluginManagerInstance, 'list_trustindex_widgets_ajax' ]);
